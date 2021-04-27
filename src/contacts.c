@@ -180,20 +180,20 @@ void key_change(int current_period_index){
 }
 
 /* The devicetree node identifier for the "led1" alias. */
-#define LED1_NODE DT_ALIAS(led1)
+// #define LED1_NODE DT_ALIAS(led1)
 
-#if DT_NODE_HAS_STATUS(LED1_NODE, okay)
-#define LED1	DT_GPIO_LABEL(LED1_NODE, gpios)
-#define PIN	DT_GPIO_PIN(LED1_NODE, gpios)
-#if DT_PHA_HAS_CELL(LED1_NODE, gpios, flags)
-#define FLAGS	DT_GPIO_FLAGS(LED1_NODE, gpios)
-#endif
-#else
-/* A build error here means your board isn't set up to blink an LED. */
-#error "Unsupported board: led0 devicetree alias is not defined"
-#define LED1	""
-#define PIN	0
-#endif
+// #if DT_NODE_HAS_STATUS(LED1_NODE, okay)
+// #define LED1	DT_GPIO_LABEL(LED1_NODE, gpios)
+// #define PIN	DT_GPIO_PIN(LED1_NODE, gpios)
+// #if DT_PHA_HAS_CELL(LED1_NODE, gpios, flags)
+// #define FLAGS	DT_GPIO_FLAGS(LED1_NODE, gpios)
+// #endif
+// #else
+// /* A build error here means your board isn't set up to blink an LED. */
+// #error "Unsupported board: led0 devicetree alias is not defined"
+// #define LED1	""
+// #define PIN	0
+// #endif
 
 #ifndef FLAGS
 #define FLAGS	0
@@ -203,31 +203,31 @@ struct device *dev;
 
 void add_infected_key(period_t* period){
     
-	//printk("Interval: %u\n", period->periodInterval);
-	//printk("RPI: "); print_rpi((rolling_proximity_identifier_t*)&period->periodKey); printk("\n");
-    next_infected_key_id++;
-    //find correct "day", TODO: also check a bit before and after
-    int index = get_index_by_interval(period->periodInterval);
-    if( index < 0 ){
-        printk("Exposure check: period %i not found\n", period->periodInterval);
-        return;
-    }
-    for( int i = 0; i < EN_TEK_ROLLING_PERIOD; i++){
-        static ENIntervalIdentifier intervalIdentifier;
-        en_derive_interval_identifier(&intervalIdentifier, &period->periodKey, period->periodInterval + i);
-        //go through all long-term contacts for this day and check if I have seen the intervalIdentifier
-        for( int j = 0; j < period_contacts[index].cnt; j++){
-            int ret = memcmp(&period_contacts[index].period_contacts[j].rolling_proximity_identifier, &intervalIdentifier, sizeof(rolling_proximity_identifier_t));
-            if( ret == 0 ){
-                printk("Found exposure: rpi ");
-                print_rpi(&period_contacts[index].period_contacts[j].rolling_proximity_identifier);
-                printk(" aem ");
-                print_aem(&period_contacts[index].period_contacts[j].associated_encrypted_metadata);
-                printk(" max rssi %i, cnt %u, duration %u\n", period_contacts[index].period_contacts[j].max_rssi, period_contacts[index].period_contacts[j].cnt, period_contacts[index].period_contacts[j].duration);
-                gpio_pin_set(dev, PIN, (int)1);
-            }
-        }
-    }
+	// //printk("Interval: %u\n", period->periodInterval);
+	// //printk("RPI: "); print_rpi((rolling_proximity_identifier_t*)&period->periodKey); printk("\n");
+    // next_infected_key_id++;
+    // //find correct "day", TODO: also check a bit before and after
+    // int index = get_index_by_interval(period->periodInterval);
+    // if( index < 0 ){
+    //     printk("Exposure check: period %i not found\n", period->periodInterval);
+    //     return;
+    // }
+    // for( int i = 0; i < EN_TEK_ROLLING_PERIOD; i++){
+    //     static ENIntervalIdentifier intervalIdentifier;
+    //     en_derive_interval_identifier(&intervalIdentifier, &period->periodKey, period->periodInterval + i);
+    //     //go through all long-term contacts for this day and check if I have seen the intervalIdentifier
+    //     for( int j = 0; j < period_contacts[index].cnt; j++){
+    //         int ret = memcmp(&period_contacts[index].period_contacts[j].rolling_proximity_identifier, &intervalIdentifier, sizeof(rolling_proximity_identifier_t));
+    //         if( ret == 0 ){
+    //             printk("Found exposure: rpi ");
+    //             print_rpi(&period_contacts[index].period_contacts[j].rolling_proximity_identifier);
+    //             printk(" aem ");
+    //             print_aem(&period_contacts[index].period_contacts[j].associated_encrypted_metadata);
+    //             printk(" max rssi %i, cnt %u, duration %u\n", period_contacts[index].period_contacts[j].max_rssi, period_contacts[index].period_contacts[j].cnt, period_contacts[index].period_contacts[j].duration);
+    //             gpio_pin_set(dev, PIN, (int)1);
+    //         }
+    //     }
+    // }
 
 }
 
@@ -236,19 +236,19 @@ uint32_t get_next_infected_key_id(){
 }
 
 void init_contacts(){
-    contact_count = 0;
-    period_index = 0;
+    // contact_count = 0;
+    // period_index = 0;
 
-	dev = device_get_binding(LED1);
-	if (dev == NULL) {
-		return;
-	}
+	// // dev = device_get_binding(LED1);
+	// if (dev == NULL) {
+	// 	return;
+	// }
 
-	int ret = gpio_pin_configure(dev, PIN, GPIO_OUTPUT_ACTIVE | FLAGS);
-	if (ret < 0) {
-		return;
-	}
+	// // int ret = gpio_pin_configure(dev, PIN, GPIO_OUTPUT_ACTIVE | FLAGS);
+	// if (ret < 0) {
+	// 	return;
+	// }
 
-    gpio_pin_set(dev, PIN, (int)0);
+    // gpio_pin_set(dev, PIN, (int)0);
 
 }

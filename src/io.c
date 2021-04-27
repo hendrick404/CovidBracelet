@@ -34,30 +34,30 @@
 //on my NRF board this is button 1
 #define SW0_NODE	DT_ALIAS(sw0)
 
-#if DT_NODE_HAS_STATUS(SW0_NODE, okay)
-#define SW0_GPIO_LABEL	DT_GPIO_LABEL(SW0_NODE, gpios)
-#define SW0_GPIO_PIN	DT_GPIO_PIN(SW0_NODE, gpios)
-#define SW0_GPIO_FLAGS	(GPIO_INPUT | FLAGS_OR_ZERO(SW0_NODE))
-#else
-#error "Unsupported board: sw0 devicetree alias is not defined"
-#define SW0_GPIO_LABEL	""
-#define SW0_GPIO_PIN	0
-#define SW0_GPIO_FLAGS	0
-#endif
+// #if DT_NODE_HAS_STATUS(SW0_NODE, okay)
+// #define SW0_GPIO_LABEL	DT_GPIO_LABEL(SW0_NODE, gpios)
+// #define SW0_GPIO_PIN	DT_GPIO_PIN(SW0_NODE, gpios)
+// #define SW0_GPIO_FLAGS	(GPIO_INPUT | FLAGS_OR_ZERO(SW0_NODE))
+// #else
+// #error "Unsupported board: sw0 devicetree alias is not defined"
+// #define SW0_GPIO_LABEL	""
+// #define SW0_GPIO_PIN	0
+// #define SW0_GPIO_FLAGS	0
+// #endif
 
 //on my NRF board this is button 2
 #define SW1_NODE	DT_ALIAS(sw1)
 
-#if DT_NODE_HAS_STATUS(SW1_NODE, okay)
-#define SW1_GPIO_LABEL	DT_GPIO_LABEL(SW1_NODE, gpios)
-#define SW1_GPIO_PIN	DT_GPIO_PIN(SW1_NODE, gpios)
-#define SW1_GPIO_FLAGS	(GPIO_INPUT | FLAGS_OR_ZERO(SW1_NODE))
-#else
-#error "Unsupported board: sw1 devicetree alias is not defined"
-#define SW1_GPIO_LABEL	""
-#define SW1_GPIO_PIN	0
-#define SW1_GPIO_FLAGS	0
-#endif
+// #if DT_NODE_HAS_STATUS(SW1_NODE, okay)
+// #define SW1_GPIO_LABEL	DT_GPIO_LABEL(SW1_NODE, gpios)
+// #define SW1_GPIO_PIN	DT_GPIO_PIN(SW1_NODE, gpios)
+// #define SW1_GPIO_FLAGS	(GPIO_INPUT | FLAGS_OR_ZERO(SW1_NODE))
+// #else
+// #error "Unsupported board: sw1 devicetree alias is not defined"
+// #define SW1_GPIO_LABEL	""
+// #define SW1_GPIO_PIN	0
+// #define SW1_GPIO_FLAGS	0
+// #endif
 
 /* The devicetree node identifier for the "led0" alias. */
 #define LED0_NODE DT_ALIAS(led0)
@@ -96,74 +96,74 @@ void button_1_pressed(struct device *dev, struct gpio_callback *cb, uint32_t pin
 }
 
 int init_io(){
-    struct device *button0, *button1;
-    int err = 0;
-    //struct device *led;
+    // struct device *button0, *button1;
+    // int err = 0;
+    // //struct device *led;
 
-    button0 = device_get_binding(SW0_GPIO_LABEL);
-    if (button0 == NULL) {
-        printk("Error: didn't find %s device\n", SW0_GPIO_LABEL);
-        return -1;
-    }
-    button1 = device_get_binding(SW1_GPIO_LABEL);
-    if (button1 == NULL) {
-        printk("Error: didn't find %s device\n", SW1_GPIO_LABEL);
-        return -1;
-    }
+    // button0 = device_get_binding(SW0_GPIO_LABEL);
+    // if (button0 == NULL) {
+    //     printk("Error: didn't find %s device\n", SW0_GPIO_LABEL);
+    //     return -1;
+    // }
+    // button1 = device_get_binding(SW1_GPIO_LABEL);
+    // if (button1 == NULL) {
+    //     printk("Error: didn't find %s device\n", SW1_GPIO_LABEL);
+    //     return -1;
+    // }
 
-    err = gpio_pin_configure(button0, SW0_GPIO_PIN, SW0_GPIO_FLAGS);
-    if (err != 0) {
-        printk("Error %d: failed to configure %s pin %d\n",
-               err, SW0_GPIO_LABEL, SW0_GPIO_PIN);
-        return err;
-    }
+    // err = gpio_pin_configure(button0, SW0_GPIO_PIN, SW0_GPIO_FLAGS);
+    // if (err != 0) {
+    //     printk("Error %d: failed to configure %s pin %d\n",
+    //            err, SW0_GPIO_LABEL, SW0_GPIO_PIN);
+    //     return err;
+    // }
 
-    err = gpio_pin_configure(button1, SW1_GPIO_PIN, SW1_GPIO_FLAGS);
-    if (err != 0) {
-        printk("Error %d: failed to configure %s pin %d\n",
-               err, SW1_GPIO_LABEL, SW1_GPIO_PIN);
-        return err;
-    }
+    // err = gpio_pin_configure(button1, SW1_GPIO_PIN, SW1_GPIO_FLAGS);
+    // if (err != 0) {
+    //     printk("Error %d: failed to configure %s pin %d\n",
+    //            err, SW1_GPIO_LABEL, SW1_GPIO_PIN);
+    //     return err;
+    // }
 
 
-    err = gpio_pin_interrupt_configure(button0,
-                                       SW0_GPIO_PIN,
-                                       GPIO_INT_EDGE_TO_ACTIVE);
-    if (err != 0) {
-        printk("Error %d: failed to configure interrupt on %s pin %d\n",
-               err, SW0_GPIO_LABEL, SW0_GPIO_PIN);
-        return err;
-    }
+    // err = gpio_pin_interrupt_configure(button0,
+    //                                    SW0_GPIO_PIN,
+    //                                    GPIO_INT_EDGE_TO_ACTIVE);
+    // if (err != 0) {
+    //     printk("Error %d: failed to configure interrupt on %s pin %d\n",
+    //            err, SW0_GPIO_LABEL, SW0_GPIO_PIN);
+    //     return err;
+    // }
 
-    err = gpio_pin_interrupt_configure(button1,
-                                       SW1_GPIO_PIN,
-                                       GPIO_INT_EDGE_TO_ACTIVE);
-    if (err != 0) {
-        printk("Error %d: failed to configure interrupt on %s pin %d\n",
-               err, SW1_GPIO_LABEL, SW1_GPIO_PIN);
-        return err;
-    }
+    // err = gpio_pin_interrupt_configure(button1,
+    //                                    SW1_GPIO_PIN,
+    //                                    GPIO_INT_EDGE_TO_ACTIVE);
+    // if (err != 0) {
+    //     printk("Error %d: failed to configure interrupt on %s pin %d\n",
+    //            err, SW1_GPIO_LABEL, SW1_GPIO_PIN);
+    //     return err;
+    // }
 
-    gpio_init_callback(&button_0_cb_data, button_0_pressed, BIT(SW0_GPIO_PIN));
-    gpio_add_callback(button0, &button_0_cb_data);
-    printk("Set up button at %s pin %d\n", SW0_GPIO_LABEL, SW0_GPIO_PIN);
+    // gpio_init_callback(&button_0_cb_data, button_0_pressed, BIT(SW0_GPIO_PIN));
+    // gpio_add_callback(button0, &button_0_cb_data);
+    // printk("Set up button at %s pin %d\n", SW0_GPIO_LABEL, SW0_GPIO_PIN);
 
-    gpio_init_callback(&button_1_cb_data, button_1_pressed, BIT(SW1_GPIO_PIN));
-    gpio_add_callback(button1, &button_1_cb_data);
-    printk("Set up button at %s pin %d\n", SW1_GPIO_LABEL, SW1_GPIO_PIN);
+    // gpio_init_callback(&button_1_cb_data, button_1_pressed, BIT(SW1_GPIO_PIN));
+    // gpio_add_callback(button1, &button_1_cb_data);
+    // printk("Set up button at %s pin %d\n", SW1_GPIO_LABEL, SW1_GPIO_PIN);
 
-    struct device *dev;
-    dev = device_get_binding(LED0);
-    if (dev == NULL) {
-        return -1;
-    }
+    // struct device *dev;
+    // dev = device_get_binding(LED0);
+    // if (dev == NULL) {
+    //     return -1;
+    // }
 
-    err = gpio_pin_configure(dev, PIN, GPIO_OUTPUT_ACTIVE | FLAGS);
-    if (err < 0) {
-        printk("Error %d: failed to configure leds\n", err);
-        return err;
-    }
-    //Turn LED 0 off
-    gpio_pin_set(dev, PIN, (int)0);
-    return 0;
+    // err = gpio_pin_configure(dev, PIN, GPIO_OUTPUT_ACTIVE | FLAGS);
+    // if (err < 0) {
+    //     printk("Error %d: failed to configure leds\n", err);
+    //     return err;
+    // }
+    // //Turn LED 0 off
+    // gpio_pin_set(dev, PIN, (int)0);
+    // return 0;
 }
