@@ -9,7 +9,7 @@
 
 #include "display.h"
 
-K_THREAD_STACK_DEFINE(display_stack_area, 5000);
+K_THREAD_STACK_DEFINE(display_stack_area, 500);
 
 #if CONFIG_DISPLAY
 const struct device* display_dev;
