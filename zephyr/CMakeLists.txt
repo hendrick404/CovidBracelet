@@ -14,6 +14,12 @@ if(DEFINED NATIVE_POSIX)
         FetchContent_Populate(exposure-notification)
     endif ()
     target_include_directories(app PUBLIC ${exposure-notification_SOURCE_DIR}/include)
+    
+    include(ExternalProject)
+    ExternalProject_Add(json-c
+        GIT_REPOSITORY    git@github.com:json-c/json-c.git
+        GIT_TAG           origin/master
+    )
 
     FILE(GLOB app_sources ../src/*.c* ${exposure-notification_SOURCE_DIR}/src/*.c*)
 else()
