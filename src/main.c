@@ -18,6 +18,7 @@
 #include "gatt_service.h"
 #include "io.h"
 #include "display.h"
+#include "http_client.h"
 
 
 void main(void) {
@@ -77,6 +78,7 @@ void main(void) {
 		printk("init display failed (err %d)\n", err);
 	}
 
+    get_infected_keys();
     
 	do{
 		do_covid();
