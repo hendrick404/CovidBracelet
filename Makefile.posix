@@ -1,0 +1,2 @@
+retrieve_keys: src/retrieve_keys.c src/export.pb-c.c
+	$(CC) $^ -o $@ -L/usr/lib/x86_64-linux-gnu/ -lprotobuf-c -l:libz.a -l:libcrypto.a -L/usr/local/lib -l:libzip.a -pthread -ldl

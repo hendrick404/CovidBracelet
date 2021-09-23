@@ -18,7 +18,7 @@
 #include "gatt_service.h"
 #include "io.h"
 #include "display.h"
-#include "http_client.h"
+#include "retrieve_keys.h"
 
 
 void main(void) {
