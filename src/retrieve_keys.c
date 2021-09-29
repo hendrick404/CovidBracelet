@@ -1,12 +1,16 @@
 #include "retrieve_keys.h"
 // #include "diagnosis_key.pb-c.h"
 #include "export.pb.h"
+// #include "export.pb-c.h"
+
 
 #include <pb_decode.h>
 #include <pb_encode.h>
+#include <pb.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 // #include <zlib.h>
 // #include <zip.h>
 // #include <openssl/pem.h>
@@ -51,12 +55,20 @@
         }                              \
     }
 
-#define MAX_MSG_SIZE 900000
+#define STORAGE_NODE DT_NODE_BY_FIXED_PARTITION_LABEL(temporary_key_storage)
+#define FLASH_NODE DT_MTD_FROM_FIXED_PARTITION(STORAGE_NODE)
+
+#define KEY_SIZE 8
+#ifndef PROTOBUF_BLOCK_SIZE
+#define PROTOBUF_BLOCK_SIZE 0
+#endif
+#define EXPORT_BUFFER_SIZE 4096
 
 // Dynamically allocate based on http-header
 // static char response[1024];
-static uint8_t export_buffer[1024];
+static uint8_t export_buffer[EXPORT_BUFFER_SIZE];
 static int export_buffer_len = 0;
+static int static_num_keys = 0;
 // static char unzipped[100000];
 // static char export_buffer[MAX_MSG_SIZE];
 // static char signature[1000];
@@ -74,15 +86,60 @@ void dump_addrinfo(const struct zsock_addrinfo* ai) {
         ((struct sockaddr_in*)ai->ai_addr)->sin_port);
 }
 
-bool write_key(pb_ostream_t* stream, const pb_field_iter_t* field, void* arg) {
-    
-}
+// bool write_key_data(pb_ostream_t* stream, const pb_field_iter_t* field, void* const* arg) {
+//     // pb_bytes_array_t data;
+//     // for (int i = 0; i < KEY_SIZE; i++) {
+//     //     data.bytes[i] = i & 0xFF;
+//     // }
+//     // data.size = KEY_SIZE;
+//     // if (!pb_encode_tag_for_field(stream, field)) {
+//     //     return false;
+//     // }
+//     // // return true;
+//     // return pb_encode(stream, PB_LTYPE_BYTES, &data);
+//     return false;
+// }
+
+// bool write_keys(pb_ostream_t* stream, const pb_field_iter_t* field, void* const* arg) {
+//     // int num = *((int*)arg);
+//     printk("Num: %d\n",static_num_keys);
+//     for (int i = 0; i < static_num_keys; i++) {
+//         printk("Generating key\n");
+//         TemporaryExposureKey key = TemporaryExposureKey_init_zero;
+//         // pb_callback_t data_callback;
+//         // key.key_data = data_callback;
+//         // key.key_data.funcs.encode = &write_key_data;
+//         // key.key_data.arg = NULL;
+//         key.report_type = 0;
+//         if (!pb_encode_tag_for_field(stream, field)) {
+//             return false;
+//         }
+//         if (!pb_encode_submessage(stream, TemporaryExposureKey_fields, &key)) {
+//             return false;
+//         }
+//     }
+//     return true;
+// }
+
+
 
 int generate_keys(uint8_t* buf, int max_len, int num_keys) {
+    static_num_keys = num_keys;
     TemporaryExposureKeyExport export = TemporaryExposureKeyExport_init_zero;
     pb_ostream_t stream = pb_ostream_from_buffer(buf, max_len);
     export.batch_size = num_keys;
     export.has_batch_size = true;
+    for(int i = 0; i < num_keys; i++) {
+         printk("Generating key\n");
+        TemporaryExposureKey key = TemporaryExposureKey_init_zero;
+        key.report_type = 0;
+        if (!pb_encode_tag(&stream, 2, 7)) {
+            return false;
+        }
+        if (!pb_encode_submessage(&stream, TemporaryExposureKey_fields, &key)) {
+            return false;
+        }
+    }
     bool status = pb_encode(&stream, TemporaryExposureKeyExport_fields, &export);
     if (!status) {
         printk("Error encoding %s\n", PB_GET_ERROR(&stream));
@@ -127,16 +184,33 @@ int generate_keys(uint8_t* buf, int max_len, int num_keys) {
 //     return cur_len;
 // }
 
-bool callback(pb_istream_t* stream, uint8_t* buf, size_t count) {
-    return 1;
+void process_key(TemporaryExposureKey* key) {
+    printk("Processing key %d\n", key->report_type);
+}
+
+bool TemporaryExporureKey_callback(pb_istream_t* stream, const pb_field_iter_t* field, void** arg) {
+        TemporaryExposureKey key;
+        if(!pb_decode(stream, TemporaryExposureKey_fields, &key)) {
+            return false;
+        }
+        process_key(&key);
+    return true;
+}
+
+bool input_stream_callback(pb_istream_t* stream, uint8_t* buf, size_t count) {
+    return false;
 }
 
 int unpack_infected_keys() {
-    export_buffer_len = generate_keys(export_buffer, 1024, 10);
+    export_buffer_len = generate_keys(export_buffer, EXPORT_BUFFER_SIZE, 10);
     printk("Bytes written: %d\n", export_buffer_len);
 
-    pb_istream_t stream =
-        pb_istream_from_buffer(export_buffer, export_buffer_len);  //{&callback, export_buffer, strlen(export_buffer)};
+    pb_istream_t stream;
+    #if PROTOBUF_BLOCK_SIZE
+    stream.callback = &input_stream_callback;
+    #else
+    stream = pb_istream_from_buffer(export_buffer, export_buffer_len);  //{&callback, export_buffer, strlen(export_buffer)};
+    #endif
 
     TemporaryExposureKeyExport tek_export = TemporaryExposureKeyExport_init_zero;
 
@@ -149,6 +223,13 @@ int unpack_infected_keys() {
     if (tek_export.has_batch_size) {
         printk("Batch size: %d\n", (int)tek_export.batch_size);
     }
+
+    printk("Status: ", stream.state)
+    // tek_export.keys.funcs.decode();
+
+    // tek_export.keys.arg = NULL;
+    // tek_export.keys.funcs.decode = &read_keys;
+ 
     printk("Executed unpack_infected_keys()\n");
     return 0;
 }

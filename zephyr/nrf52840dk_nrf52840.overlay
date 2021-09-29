@@ -7,7 +7,7 @@
 
 		partition@0 {
 			label = "ens_storage";
-			reg = <0x0000000 0x00300000>;
+			reg = <0x0000000 0x0030000>;
 		};
 	};
 };
