@@ -13,35 +13,34 @@
 #include "contacts.h"
 #include "covid.h"
 #include "covid_types.h"
+#include "display.h"
 #include "ens/storage.h"
 #include "exposure-notification.h"
 #include "gatt_service.h"
 #include "io.h"
-#include "display.h"
 #include "retrieve_keys.h"
-
 
 void main(void) {
     int err = 0;
     printk("Starting Covid Contact Tracer\n");
 
-    // first init everything
-	#ifndef NATIVE_POSIX
+// first init everything
+#ifndef NATIVE_POSIX
     // Use custom randomization as the mbdet_tls context initialization messes with the Zeyhr BLE stack.
     err = en_init(sys_csrand_get);
     if (err) {
         printk("Cyrpto init failed (err %d)\n", err);
         return;
     }
-	#endif
+#endif
 
-    #if CONFIG_FLASH
+#if CONFIG_FLASH
     err = init_record_storage();
     if (err) {
         printk("init storage failed (err %d)\n", err);
         return;
     }
-    #endif
+#endif
 
     err = init_io();
     if (err) {
@@ -49,22 +48,22 @@ void main(void) {
         return;
     }
 
-	#if CONFIG_BT
-	/* Initialize the Bluetooth Subsystem */
-	err = bt_enable(NULL);
-	if (err) {
-		printk("Bluetooth init failed (err %d)\n", err);
-		return;
-	}
+#if CONFIG_BT
+    /* Initialize the Bluetooth Subsystem */
+    err = bt_enable(NULL);
+    if (err) {
+        printk("Bluetooth init failed (err %d)\n", err);
+        return;
+    }
 
     printk("Bluetooth initialized\n");
 
-	err = init_gatt();
-	if (err) {
-		printk("init gatt failed(err %d)\n", err);
-		return;
-	}
-	#endif
+    err = init_gatt();
+    if (err) {
+        printk("init gatt failed(err %d)\n", err);
+        return;
+    }
+#endif
 
     err = init_covid();
     if (err) {
@@ -72,17 +71,18 @@ void main(void) {
         return;
     }
 
-	printk("init display\n");
-	err = init_display();
-	if (err) {
-		printk("init display failed (err %d)\n", err);
-	}
+    printk("init display\n");
+    err = init_display();
+    if (err) {
+        printk("init display failed (err %d)\n", err);
+    }
 
-    unpack_infected_keys();
-    
-	do{
-		do_covid();
-		do_gatt();
-	} while (1);
-	
+    for (int i = 0; i < 14; i++) {
+        test_unpacking(1 << i);
+    }
+
+    // do{
+    // 	do_covid();
+    // 	do_gatt();
+    // } while (1);
 }

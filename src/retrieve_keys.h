@@ -5,4 +5,6 @@ int get_infected_keys();
 
 int unpack_infected_keys();
 
+int test_unpacking(int num_keys);
+
 #endif
